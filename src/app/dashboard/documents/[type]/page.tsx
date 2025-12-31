@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { DocumentType } from "@prisma/client";
 import { DocumentEditor } from "@/components/editor/document-editor";
 import { getDocumentLabel, getDocumentDescription } from "@/lib/documents";
+import { getDocumentTemplate } from "@/lib/document-templates";
 
 interface PageProps {
   params: Promise<{
@@ -38,15 +39,13 @@ export default async function DocumentPage({ params }: PageProps) {
     },
   });
 
-  // If document doesn't exist, create it (for frameworks)
+  // If document doesn't exist, create it with template
   if (!document) {
     document = await db.document.create({
       data: {
         userId: session.user.id,
         type: documentType,
-        content: `# ${getDocumentLabel(documentType)}\n\n${getDocumentDescription(
-          documentType
-        )}\n\n---\n\n*Start writing here...*`,
+        content: getDocumentTemplate(documentType),
       },
     });
   }
