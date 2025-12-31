@@ -1,12 +1,12 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
+
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { formatDate, formatDateShort } from "@/lib/utils";
 import { DailyReviewContent } from "@/types/reviews";
 
 export default async function DailyReviewsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user) {
     return null;

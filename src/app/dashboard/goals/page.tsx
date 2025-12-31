@@ -1,11 +1,11 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
+
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { GoalContent, getStatusLabel, getStatusColor } from "@/types/goals";
 
 export default async function GoalsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user) {
     return null;

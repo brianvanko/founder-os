@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
+
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { DocumentType } from "@prisma/client";
@@ -13,7 +13,7 @@ interface PageProps {
 }
 
 export default async function DocumentPage({ params }: PageProps) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const { type } = await params;
 
   if (!session?.user) {
