@@ -31,7 +31,7 @@ export const authConfig = {
 
         const user = await db.user.findUnique({
           where: {
-            email: credentials.email,
+            email: credentials.email as string,
           },
         });
 
@@ -40,7 +40,7 @@ export const authConfig = {
         }
 
         const isPasswordValid = await compare(
-          credentials.password,
+          credentials.password as string,
           user.passwordHash
         );
 
