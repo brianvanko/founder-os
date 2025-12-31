@@ -19,7 +19,9 @@ const navigation = [
   { name: "Goals", href: "/dashboard/goals" },
   { name: "Search", href: "/dashboard/search" },
   { name: "Timeline", href: "/dashboard/timeline" },
+  { name: "Insights", href: "/dashboard/insights" },
   { name: "Documents", href: "/dashboard/documents" },
+  { name: "Uploads", href: "/dashboard/uploads" },
 ];
 
 export function DashboardNav({ user }: DashboardNavProps) {
@@ -33,7 +35,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
           <div className="flex">
             <Link href="/dashboard" className="flex items-center">
               <span className="text-xl font-bold text-slate-900">
-                CEO Personal OS
+                Founder Personal OS
               </span>
             </Link>
             <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
@@ -58,6 +60,19 @@ export function DashboardNav({ user }: DashboardNavProps) {
           </div>
           <div className="flex items-center">
             <div className="hidden sm:flex sm:items-center sm:gap-4">
+              <Link
+                href="/dashboard/billing"
+                className="text-sm text-slate-600 hover:text-slate-900 font-medium"
+              >
+                Billing
+              </Link>
+              <a
+                href="/api/export"
+                download
+                className="text-sm text-slate-600 hover:text-slate-900 font-medium"
+              >
+                Export
+              </a>
               <span className="text-sm text-slate-600 truncate max-w-[150px]">
                 {user.name || user.email}
               </span>
@@ -143,6 +158,19 @@ export function DashboardNav({ user }: DashboardNavProps) {
               )}
             </div>
             <div className="mt-3 space-y-1">
+              <Link
+                href="/dashboard/billing"
+                className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50"
+              >
+                Billing
+              </Link>
+              <a
+                href="/api/export"
+                download
+                className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50"
+              >
+                Export
+              </a>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-50"

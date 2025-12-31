@@ -1,4 +1,4 @@
-// CEO Personal OS - Database Schema
+// Founder Personal OS - Database Schema
 // Multi-tenant SaaS with Row-Level Security
 
 generator client {
@@ -26,7 +26,7 @@ model User {
 
   // Profile data
   company       String?
-  role          String?   // CEO, Founder, etc.
+  role          String?   // Founder, CEO, etc.
   stageOfLife   String?   // e.g., "Early 40s, two young kids"
   priorities    String?   // Top 2-3 current priorities
 
@@ -38,6 +38,7 @@ model User {
   interviews    Interview[]
   goals         Goal[]
   uploads       Upload[]
+  subscription  Subscription?
 
   @@map("users")
 }
@@ -209,4 +210,24 @@ model Upload {
 
   @@index([userId, category])
   @@map("uploads")
+}
+
+// ============================================================================
+// SUBSCRIPTIONS & BILLING (Stripe)
+// ============================================================================
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String    @unique
+  stripePriceId        String
+  stripeCurrentPeriodEnd DateTime?
+  status               String    // active, canceled, past_due, etc.
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
 }

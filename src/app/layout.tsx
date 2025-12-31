@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CEO Personal OS",
+  title: "Founder Personal OS",
   description: "Your private productivity system for clarity without complexity",
 };
 
