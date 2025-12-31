@@ -1,8 +1,5 @@
 import { auth } from "@/lib/auth";
-
-import { db } from "@/lib/db";
 import Link from "next/link";
-import { GoalContent, getStatusLabel, getStatusColor } from "@/types/goals";
 
 export default async function GoalsPage() {
   const session = await auth();
@@ -11,160 +8,50 @@ export default async function GoalsPage() {
     return null;
   }
 
-  const goals = await db.goal.findMany({
-    where: {
-      userId: session.user.id,
-      timeframe: "ONE_YEAR",
+  const goalTimeframes = [
+    {
+      name: "1-Year Goals",
+      description: "Your goals for the next 12 months",
+      href: "/dashboard/goals/1-year",
+      color: "bg-blue-50 border-blue-200 hover:bg-blue-100",
     },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const goalsWithParsedContent = goals.map((goal) => ({
-    ...goal,
-    content: JSON.parse(goal.content) as GoalContent,
-  }));
-
-  const activeGoals = goalsWithParsedContent.filter(
-    (g) => g.status !== "completed" && g.status !== "abandoned"
-  );
-  const completedGoals = goalsWithParsedContent.filter(
-    (g) => g.status === "completed"
-  );
+    {
+      name: "3-Year Goals",
+      description: "Your medium-term vision (36 months)",
+      href: "/dashboard/goals/3-year",
+      color: "bg-purple-50 border-purple-200 hover:bg-purple-100",
+    },
+    {
+      name: "10-Year Goals",
+      description: "Your long-term aspirations",
+      href: "/dashboard/goals/10-year",
+      color: "bg-orange-50 border-orange-200 hover:bg-orange-100",
+    },
+  ];
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">1-Year Goals</h1>
-          <p className="text-slate-600 mt-2">
-            Your goals for the next 12 months
-          </p>
-        </div>
-        <Link
-          href="/dashboard/goals/new"
-          className="px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
-        >
-          New Goal
-        </Link>
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Goals</h1>
+        <p className="text-slate-600 mt-2">
+          Track your 1-year, 3-year, and 10-year goals
+        </p>
       </div>
 
-      {goalsWithParsedContent.length === 0 ? (
-        <div className="bg-white rounded-lg border border-slate-200 p-12 text-center">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
-            No goals yet
-          </h3>
-          <p className="text-slate-600 mb-6">
-            Set your first 1-year goal to start tracking progress.
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {goalTimeframes.map((timeframe) => (
           <Link
-            href="/dashboard/goals/new"
-            className="inline-block px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+            key={timeframe.name}
+            href={timeframe.href}
+            className={`p-6 rounded-lg border-2 transition-colors ${timeframe.color}`}
           >
-            Create First Goal
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+              {timeframe.name}
+            </h3>
+            <p className="text-sm text-slate-600">{timeframe.description}</p>
           </Link>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {/* Active Goals */}
-          {activeGoals.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                Active Goals ({activeGoals.length})
-              </h2>
-              <div className="grid grid-cols-1 gap-6">
-                {activeGoals.map((goal) => (
-                  <Link
-                    key={goal.id}
-                    href={`/dashboard/goals/${goal.id}`}
-                    className="bg-white rounded-lg border border-slate-200 p-6 hover:border-slate-300 transition-colors"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-slate-900">
-                            {goal.title}
-                          </h3>
-                          {goal.category && (
-                            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded">
-                              {goal.category}
-                            </span>
-                          )}
-                          {goal.status && (
-                            <span
-                              className={`text-xs px-2 py-1 rounded ${getStatusColor(
-                                goal.status
-                              )}`}
-                            >
-                              {getStatusLabel(goal.status)}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-slate-600 line-clamp-2">
-                          {goal.content.what}
-                        </p>
-                      </div>
-                      {goal.progress !== null && (
-                        <div className="ml-4 text-right">
-                          <div className="text-2xl font-bold text-slate-900">
-                            {goal.progress}
-                            <span className="text-sm text-slate-500">/10</span>
-                          </div>
-                          <p className="text-xs text-slate-500">Progress</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {goal.content.firstAction && (
-                      <div className="mt-4 pt-4 border-t border-slate-100">
-                        <p className="text-xs text-slate-500 mb-1">
-                          Next Action:
-                        </p>
-                        <p className="text-sm text-slate-700">
-                          {goal.content.firstAction}
-                        </p>
-                      </div>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Completed Goals */}
-          {completedGoals.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                Completed Goals ({completedGoals.length})
-              </h2>
-              <div className="grid grid-cols-1 gap-4">
-                {completedGoals.map((goal) => (
-                  <Link
-                    key={goal.id}
-                    href={`/dashboard/goals/${goal.id}`}
-                    className="bg-slate-50 rounded-lg border border-slate-200 p-4 hover:border-slate-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-slate-900">
-                          {goal.title}
-                        </h3>
-                        {goal.category && (
-                          <span className="text-xs text-slate-500">
-                            {goal.category}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                        Completed
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
