@@ -1,0 +1,212 @@
+// CEO Personal OS - Database Schema
+// Multi-tenant SaaS with Row-Level Security
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USERS & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?   // null if OAuth only
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Profile data
+  company       String?
+  role          String?   // CEO, Founder, etc.
+  stageOfLife   String?   // e.g., "Early 40s, two young kids"
+  priorities    String?   // Top 2-3 current priorities
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  documents     Document[]
+  reviews       Review[]
+  interviews    Interview[]
+  goals         Goal[]
+  uploads       Upload[]
+
+  @@map("users")
+}
+
+// NextAuth tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================================================
+// CORE DOCUMENTS (Principles, North Star, Memory, Frameworks)
+// ============================================================================
+
+model Document {
+  id          String       @id @default(cuid())
+  userId      String
+  type        DocumentType
+  content     String       @db.Text // Markdown content
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@index([userId, type])
+  @@map("documents")
+}
+
+enum DocumentType {
+  PRINCIPLES
+  NORTH_STAR
+  MEMORY
+  FRAMEWORK_ANNUAL_REVIEW
+  FRAMEWORK_VIVID_VISION
+  FRAMEWORK_IDEAL_LIFE_COSTING
+  FRAMEWORK_LIFE_MAP
+}
+
+// ============================================================================
+// REVIEWS (Daily, Weekly, Quarterly, Annual)
+// ============================================================================
+
+model Review {
+  id          String     @id @default(cuid())
+  userId      String
+  type        ReviewType
+  date        DateTime   // The date this review is for
+  content     String     @db.Text // JSONB stored as text
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, date])
+  @@index([userId, date])
+  @@index([userId, type])
+  @@map("reviews")
+}
+
+enum ReviewType {
+  DAILY
+  WEEKLY
+  QUARTERLY
+  ANNUAL
+}
+
+// ============================================================================
+// INTERVIEWS (Past Year, Identity & Values, Future Self)
+// ============================================================================
+
+model Interview {
+  id          String        @id @default(cuid())
+  userId      String
+  type        InterviewType
+  content     String        @db.Text // JSONB with questions and answers
+  completedAt DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("interviews")
+}
+
+enum InterviewType {
+  PAST_YEAR_REFLECTION
+  IDENTITY_AND_VALUES
+  FUTURE_SELF_INTERVIEW
+}
+
+// ============================================================================
+// GOALS (1-year, 3-year, 10-year)
+// ============================================================================
+
+model Goal {
+  id              String    @id @default(cuid())
+  userId          String
+  timeframe       Timeframe
+  title           String
+  category        String?   // Business, Personal, Health, Relationships, etc.
+  content         String    @db.Text // Full goal details as JSONB
+  status          String?   // on_track, off_track, completed, abandoned
+  progress        Int?      // 1-10 rating
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, timeframe])
+  @@map("goals")
+}
+
+enum Timeframe {
+  ONE_YEAR
+  THREE_YEAR
+  TEN_YEAR
+}
+
+// ============================================================================
+// FILE UPLOADS (Past reviews, notes, documents)
+// ============================================================================
+
+model Upload {
+  id            String    @id @default(cuid())
+  userId        String
+  fileName      String
+  fileSize      Int
+  fileType      String    // MIME type
+  storagePath   String    // Supabase Storage path
+  category      String?   // past_annual_reviews, notes, etc.
+  uploadedAt    DateTime  @default(now())
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, category])
+  @@map("uploads")
+}
