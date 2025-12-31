@@ -18,9 +18,11 @@ A multi-tenant SaaS web application for CEOs to maintain clarity through daily c
 - ✅ Toast notifications for better UX
 - ✅ Mobile-responsive design with hamburger menu
 
-**Ready for deployment to Vercel!**
+**✅ Deployed to Vercel!**
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment instructions.
+**Live at:** [https://founder-os-nine.vercel.app](https://founder-os-nine.vercel.app)
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment details.
 
 ## Tech Stack
 
@@ -138,7 +140,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=   # Your Supabase anon key
 - [x] Edit/Delete functionality
 - [x] Toast notifications
 - [x] Mobile-responsive design
-- [ ] Deploy to Vercel (next step!)
+- [x] Deploy to Vercel
 
 ### Phase 2: Review System - Weeks 4-5
 - [ ] Weekly reviews
