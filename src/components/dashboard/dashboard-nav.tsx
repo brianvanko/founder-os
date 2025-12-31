@@ -15,7 +15,7 @@ interface DashboardNavProps {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard" },
-  { name: "Daily Reviews", href: "/dashboard/reviews/daily" },
+  { name: "Reviews", href: "/dashboard/reviews/daily" },
   { name: "Goals", href: "/dashboard/goals" },
   { name: "Documents", href: "/dashboard/documents" },
 ];
