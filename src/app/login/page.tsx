@@ -24,15 +24,21 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
+        callbackUrl: "/dashboard",
       });
+
+      console.log("Login result:", result); // Debug log
 
       if (result?.error) {
         setError("Invalid email or password");
+      } else if (result?.ok) {
+        // Successful login
+        window.location.href = "/dashboard"; // Force full page reload
       } else {
-        router.push("/dashboard");
-        router.refresh();
+        setError("Login failed. Please try again.");
       }
     } catch (error) {
+      console.error("Login error:", error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
