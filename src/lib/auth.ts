@@ -74,21 +74,6 @@ export const authConfig = {
       }
       return session;
     },
-    authorized({ auth, request }: any) {
-      const isLoggedIn = !!auth?.user;
-      const isOnProtectedRoute =
-        request.nextUrl.pathname.startsWith("/dashboard") ||
-        request.nextUrl.pathname.startsWith("/reviews") ||
-        request.nextUrl.pathname.startsWith("/goals") ||
-        request.nextUrl.pathname.startsWith("/documents") ||
-        request.nextUrl.pathname.startsWith("/interviews") ||
-        request.nextUrl.pathname.startsWith("/settings");
-
-      if (isOnProtectedRoute && !isLoggedIn) {
-        return false; // Redirect to login page
-      }
-      return true;
-    },
   },
 };
 
