@@ -1,18 +1,20 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
-export function middleware(request: NextRequest) {
-  // Get the session token from cookies
-  const sessionToken = request.cookies.get("next-auth.session-token") ||
-                       request.cookies.get("__Secure-next-auth.session-token");
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard");
+  const isOnProtectedRoute =
+    req.nextUrl.pathname.startsWith("/dashboard") ||
+    req.nextUrl.pathname.startsWith("/reviews") ||
+    req.nextUrl.pathname.startsWith("/goals") ||
+    req.nextUrl.pathname.startsWith("/documents") ||
+    req.nextUrl.pathname.startsWith("/interviews") ||
+    req.nextUrl.pathname.startsWith("/settings");
 
-  // If no session token, redirect to login
-  if (!sessionToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (isOnProtectedRoute && !isLoggedIn) {
+    return Response.redirect(new URL("/login", req.nextUrl));
   }
-
-  return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
