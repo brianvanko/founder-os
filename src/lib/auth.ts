@@ -36,15 +36,19 @@ export const authConfig = {
         });
 
         if (!user || !user.passwordHash) {
+          console.log("User not found or no password hash");
           throw new Error("Invalid email or password");
         }
 
+        console.log("Comparing passwords for user:", user.email);
         const isPasswordValid = await compare(
           credentials.password as string,
           user.passwordHash
         );
+        console.log("Password valid:", isPasswordValid);
 
         if (!isPasswordValid) {
+          console.log("Password comparison failed");
           throw new Error("Invalid email or password");
         }
 

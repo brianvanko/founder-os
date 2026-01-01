@@ -13,6 +13,7 @@ export async function createUser(email: string, password: string, name?: string)
 
   // Hash password
   const passwordHash = await hash(password, 12);
+  console.log("Created password hash for:", email, "Hash length:", passwordHash.length);
 
   // Create user
   const user = await db.user.create({
@@ -22,6 +23,7 @@ export async function createUser(email: string, password: string, name?: string)
       name,
     },
   });
+  console.log("User created successfully:", email);
 
   // Initialize core documents for new user
   await initializeUserDocuments(user.id);
